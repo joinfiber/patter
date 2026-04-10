@@ -1,0 +1,14 @@
+{
+    "stt_mode": "local",
+    "local_stt_model": "small",
+
+    "api_key": "YOUR_API_KEY_HERE",
+    "stt_model": "openai/whisper-large-v3-turbo",
+    "stt_endpoint": "https://api.deepinfra.com/v1/audio/transcriptions",
+
+    "llm_model": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+    "llm_endpoint": "https://api.deepinfra.com/v1/openai/chat/completions",
+
+    "sample_rate": 16000,
+    "chunk_seconds": 15
+}

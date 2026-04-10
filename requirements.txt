@@ -1,0 +1,9 @@
+numpy
+sounddevice
+requests
+pynput
+pyperclip
+soundfile
+
+# Optional: for local offline transcription (no API needed)
+# faster-whisper

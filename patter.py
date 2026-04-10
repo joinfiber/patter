@@ -100,7 +100,7 @@ def frames_to_wav(frames):
 
 def frames_to_ogg(frames):
     """Compress PCM frames to OGG Vorbis. Safe for chunks under 45s."""
-    import soundfile as sf
+    import soundfile as sf  # lazy: not needed in local mode, cached after first call
     audio = np.concatenate(frames, axis=0).astype(np.float32) / 32768.0
     buf = io.BytesIO()
     sf.write(buf, audio, SAMPLE_RATE, format="OGG", subtype="VORBIS")

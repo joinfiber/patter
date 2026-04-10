@@ -56,7 +56,7 @@ class DictationOverlay:
         # Audio levels fed from audio thread
         self._lock = threading.Lock()
         self._current_rms = 0.0
-        self._level_history = collections.deque(maxlen=48)
+        self._level_history = collections.deque(maxlen=48)  # ~1.6s of levels at 30fps
 
         # Processing state
         self._proc_start = 0.0

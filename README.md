@@ -106,18 +106,6 @@ Cloud mode works with any service that exposes an OpenAI-compatible API. Set `st
 }
 ```
 
-**Groq** (fast, has free tier):
-```json
-{
-    "api_key": "your-groq-key",
-    "stt_mode": "api",
-    "stt_endpoint": "https://api.groq.com/openai/v1/audio/transcriptions",
-    "stt_model": "whisper-large-v3-turbo",
-    "llm_endpoint": "https://api.groq.com/openai/v1/chat/completions",
-    "llm_model": "llama-3.3-70b-versatile"
-}
-```
-
 **Local (fully offline, free):**
 ```json
 {

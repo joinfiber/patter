@@ -285,7 +285,8 @@ class DictationOverlay:
             else:
                 level = 0.0
 
-            # Perceptual scaling: sqrt for better visual spread
+            # Perceptual scaling: normalize against typical speech RMS (~12k),
+            # then sqrt for better visual spread across the bar range.
             norm = min(1.0, level / 12000.0)
             norm = math.sqrt(norm)
             h = max(1.5, norm * max_h)

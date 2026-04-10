@@ -82,7 +82,8 @@ chunk_threads = []
 chunk_frame_count = 0
 
 session = requests.Session()
-session.headers.update({"Authorization": f"Bearer {API_KEY}"})
+if API_KEY:
+    session.headers.update({"Authorization": f"Bearer {API_KEY}"})
 
 # ── Audio encoding ──────────────────────────────────────────────────────────
 
@@ -104,12 +105,6 @@ def frames_to_ogg(frames):
     buf = io.BytesIO()
     sf.write(buf, audio, SAMPLE_RATE, format="OGG", subtype="VORBIS")
     return buf.getvalue()
-
-def encode_chunk(frames):
-    """Encode audio frames, choosing format based on STT mode."""
-    if STT_MODE == "local":
-        return frames_to_wav(frames), "audio.wav", "audio/wav"
-    return frames_to_ogg(frames), "audio.ogg", "audio/ogg"
 
 # ── Transcription ───────────────────────────────────────────────────────────
 
@@ -185,6 +180,8 @@ def llm_cleanup(raw_text):
     resp.raise_for_status()
     cleaned = resp.json()["choices"][0]["message"]["content"].strip()
 
+    # Guard against common LLM output quirks: wrapping in quotes,
+    # or appending chatbot commentary after a double newline.
     if cleaned.startswith('"') and cleaned.endswith('"'):
         cleaned = cleaned[1:-1]
     if "\n\n" in cleaned:
@@ -242,7 +239,10 @@ def paste_text(text):
 def dispatch_chunk(chunk_frames, chunk_index):
     """Encode and transcribe a chunk in the background."""
     try:
-        audio_bytes, fname, mime = encode_chunk(chunk_frames)
+        if STT_MODE == "local":
+            audio_bytes, fname, mime = frames_to_wav(chunk_frames), "audio.wav", "audio/wav"
+        else:
+            audio_bytes, fname, mime = frames_to_ogg(chunk_frames), "audio.ogg", "audio/ogg"
         raw_kb = sum(f.shape[0] for f in chunk_frames) * 2 // 1024
         print(f"    [Chunk {chunk_index}] {len(audio_bytes)//1024}KB "
               f"(from {raw_kb}KB) sending...", flush=True)
@@ -366,7 +366,8 @@ win_pressed = False
 shift_pressed = False
 
 def on_press(key):
-    global recording, ctrl_pressed, win_pressed, shift_pressed, use_llm_this_recording
+    global recording, ctrl_pressed, win_pressed, shift_pressed
+    global use_llm_this_recording, chunk_frame_count
 
     if key in (keyboard.Key.ctrl_l, keyboard.Key.ctrl_r):
         ctrl_pressed = True
@@ -381,7 +382,7 @@ def on_press(key):
         audio_frames.clear()
         chunk_results.clear()
         chunk_threads.clear()
-        globals()["chunk_frame_count"] = 0
+        chunk_frame_count = 0
         mode = "LLM" if use_llm_this_recording else "raw"
         print(f"\n  Recording ({mode})...", flush=True)
         if overlay:
